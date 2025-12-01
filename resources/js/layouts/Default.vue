@@ -34,6 +34,14 @@
         },
       },
       {
+        label: 'Users',
+        icon: 'i-lucide-user-circle',
+        to: '/users',
+        onSelect: () => {
+          open.value = false
+        },
+      },
+      {
         label: 'Settings',
         to: '/settings',
         icon: 'i-lucide-settings',

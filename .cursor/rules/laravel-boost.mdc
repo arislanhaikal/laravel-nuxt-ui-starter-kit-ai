@@ -27,6 +27,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - rector/rector (RECTOR) - v2
 - @inertiajs/vue3 (INERTIA) - v2
 - vue (VUE) - v3
+- @nuxt/ui (NUXT-UI) - v4
 - @laravel/vite-plugin-wayfinder (WAYFINDER) - v0
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
@@ -452,4 +453,89 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 </Form>
 
 </code-snippet>
+
+
+=== nuxt-ui/core rules ===
+
+## Nuxt UI Components
+
+- This application uses **Nuxt UI v4** for all UI components. Always use Nuxt UI components, not shadcn-vue or custom component replacements.
+- Nuxt UI components are auto-imported and available globally. No explicit imports needed for most components.
+- Use the Nuxt UI MCP tools (`mcp_nuxt-ui_*`) to discover available components, view documentation, and get examples.
+
+### Component Usage Guidelines
+
+- **Always use Nuxt UI components** - Import and use components from `@nuxt/ui` package (auto-imported).
+- **Component Naming**: Nuxt UI components use PascalCase with `U` prefix (e.g., `UButton`, `UModal`, `UCard`, `UInput`, `UForm`, `UTable`, `UBadge`, `UDropdownMenu`, etc.).
+- **No Custom UI Components**: Do NOT create custom component replacements or wrappers unless explicitly requested. Use the provided Nuxt UI components.
+- **Check Existing Components**: Before creating new components, check existing components in `resources/js/components/` to see if similar functionality exists.
+- **Documentation**: Use the `mcp_nuxt-ui_get-component` tool to get component documentation and `mcp_nuxt-ui_get-example` for usage examples.
+
+### Dashboard Design Principles
+
+- **Minimalist Design**: Emphasize clean typography, ample white space, and a restrained color palette. Avoid visual clutter or excessive ornamentation.
+- **Responsive Layout**: Implement responsive layouts that work seamlessly across all device sizes (mobile, tablet, desktop).
+- **Clean Aesthetics**: Use Nuxt UI's built-in design system for consistent spacing, colors, and typography.
+- **Component Composition**: Leverage Nuxt UI's component composition patterns (e.g., `UDashboardPanel`, `UDashboardNavbar`, `UDashboardSidebar`, `UDashboardToolbar`).
+
+### Common Nuxt UI Components
+
+- **Layout Components**: `UDashboardPanel`, `UDashboardNavbar`, `UDashboardSidebar`, `UDashboardToolbar`, `UPageCard`
+- **Form Components**: `UForm`, `UFormField`, `UInput`, `UTextarea`, `USelect`, `UCheckbox`, `URadio`, `UButton`
+- **Data Display**: `UTable`, `UCard`, `UBadge`, `UAvatar`, `UProgress`, `USkeleton`
+- **Overlays**: `UModal`, `UDropdownMenu`, `UTooltip`, `UPopover`, `UAlert`
+- **Navigation**: `UTabs`, `UPagination`, `UBreadcrumb`
+- **Feedback**: `UToast` (via `useToast()` composable), `UAlert`, `UNotification`
+
+### Example Usage
+
+<code-snippet name="Nuxt UI Button Example" lang="vue">
+<UButton color="primary" variant="solid" icon="i-lucide-plus">
+  Create New
+</UButton>
+</code-snippet>
+
+<code-snippet name="Nuxt UI Form Example" lang="vue">
+<UForm :schema="schema" :state="state" @submit="onSubmit">
+  <UFormField label="Name" name="name">
+    <UInput v-model="state.name" />
+  </UFormField>
+  <UFormField label="Email" name="email">
+    <UInput v-model="state.email" type="email" />
+  </UFormField>
+  <UButton type="submit">Submit</UButton>
+</UForm>
+</code-snippet>
+
+<code-snippet name="Nuxt UI Dashboard Layout Example" lang="vue">
+<UDashboardPanel id="dashboard">
+  <template #header>
+    <UDashboardNavbar title="Dashboard">
+      <template #right>
+        <UButton icon="i-lucide-plus" />
+      </template>
+    </UDashboardNavbar>
+  </template>
+  
+  <template #body>
+    <UCard>
+      <template #header>
+        <h3>Statistics</h3>
+      </template>
+      <!-- Content -->
+    </UCard>
+  </template>
+</UDashboardPanel>
+</code-snippet>
+
+### Responsive Design
+
+- Use Tailwind CSS responsive utilities (`sm:`, `md:`, `lg:`, `xl:`) for responsive layouts.
+- Nuxt UI components are responsive by default, but use Tailwind utilities for custom responsive behavior.
+- Test layouts on multiple viewport sizes to ensure proper responsiveness.
+
+### Dark Mode
+
+- Nuxt UI supports dark mode out of the box. Use the `colorMode` composable or `UColorModeButton` component.
+- Ensure all new components and pages support dark mode properly.
 </laravel-boost-guidelines>

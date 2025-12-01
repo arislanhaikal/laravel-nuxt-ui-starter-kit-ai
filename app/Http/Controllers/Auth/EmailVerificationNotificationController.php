@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use function back;
+use function route;
+use function redirect;
+
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-
-use function back;
-use function redirect;
-use function route;
 
 class EmailVerificationNotificationController extends Controller
 {

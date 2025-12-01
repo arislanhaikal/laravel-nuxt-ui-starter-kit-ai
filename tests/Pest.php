@@ -11,8 +11,8 @@
 |
 */
 
-use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Sleep;
 
 pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)

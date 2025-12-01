@@ -2,14 +2,14 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Resources\UserResource;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Http\Request;
-use Inertia\Middleware;
-
-use function config;
 use function str;
 use function trim;
+use function config;
+
+use Inertia\Middleware;
+use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
+use Illuminate\Foundation\Inspiring;
 
 class HandleInertiaRequests extends Middleware
 {

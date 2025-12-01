@@ -1,9 +1,9 @@
 <?php
 
-use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetList;
 use RectorLaravel\Set\LaravelSetProvider;
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 
 return RectorConfig::configure()
     ->withSetProviders(LaravelSetProvider::class)
@@ -25,13 +25,13 @@ return RectorConfig::configure()
         cacheClass: FileCacheStorage::class,
     )
     ->withPaths([
-        __DIR__.'/app',
-        __DIR__.'/bootstrap/app.php',
-        __DIR__.'/config',
-        __DIR__.'/database',
-        __DIR__.'/public',
-        __DIR__.'/routes',
-        __DIR__.'/tests',
+        __DIR__ . '/app',
+        __DIR__ . '/bootstrap/app.php',
+        __DIR__ . '/config',
+        __DIR__ . '/database',
+        __DIR__ . '/public',
+        __DIR__ . '/routes',
+        __DIR__ . '/tests',
     ])
     ->withPreparedSets(
         deadCode: true,
