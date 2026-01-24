@@ -161,9 +161,33 @@
           <template #default="{ collapsed }">
             <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 
-            <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" tooltip popover />
+            <div class="mt-4 flex flex-1 flex-col gap-4">
+              <UNavigationMenu
+                :collapsed="collapsed"
+                :items="links[0]"
+                orientation="vertical"
+                tooltip
+                popover
+                :ui="{
+                  list: 'space-y-1',
+                  item: 'py-1',
+                  link: 'py-1',
+                }"
+              />
 
-            <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" tooltip class="mt-auto" />
+              <UNavigationMenu
+                :collapsed="collapsed"
+                :items="links[1]"
+                orientation="vertical"
+                tooltip
+                class="mt-auto"
+                :ui="{
+                  list: 'space-y-1',
+                  item: 'py-1',
+                  link: 'py-1',
+                }"
+              />
+            </div>
           </template>
 
           <template #footer="{ collapsed }">

@@ -31,7 +31,7 @@ class UserController extends Controller
                 });
             })
             ->latest()
-            ->paginate(2)
+            ->paginate(10)
             ->through(fn (User $user) => [
                 'id' => $user->id,
                 'uuid' => $user->uuid,

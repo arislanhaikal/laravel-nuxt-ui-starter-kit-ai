@@ -1,8 +1,6 @@
 # Nuxt UI v4 Guideline
 
-**For Laravel Boost Projects**
-
-## Core Principle (Non-Negotiable)
+## Core Principle
 
 > **Always prefer Nuxt UI components over custom UI.**
 
@@ -11,6 +9,7 @@ If a component exists in Nuxt UI:
 - It **must** be used
 - Re-implementation is **not allowed**
 - Styling duplication is **not acceptable**
+- Customize theme or component configuration in `vite.config.ts`
 
 This ensures:
 

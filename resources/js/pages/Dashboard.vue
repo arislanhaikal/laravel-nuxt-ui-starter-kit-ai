@@ -65,9 +65,37 @@
     </template>
 
     <template #body>
-      <HomeStats :period="period" :range="range" />
-      <HomeChart :period="period" :range="range" />
-      <HomeSales :period="period" :range="range" />
+      <div class="flex flex-col gap-6">
+        <UCard>
+          <template #header>
+            <div>
+              <p class="text-sm font-bold text-muted">Overview</p>
+              <p class="text-xs text-muted">Key performance indicators for the selected period.</p>
+            </div>
+          </template>
+          <HomeStats :period="period" :range="range" />
+        </UCard>
+
+        <UCard>
+          <template #header>
+            <div>
+              <p class="text-sm font-bold text-muted">Trends</p>
+              <p class="text-xs text-muted">Traffic and revenue movement over time.</p>
+            </div>
+          </template>
+          <HomeChart :period="period" :range="range" />
+        </UCard>
+
+        <UCard>
+          <template #header>
+            <div>
+              <p class="text-sm font-bold text-muted">Recent Sales</p>
+              <p class="text-xs text-muted">Latest transactions with customer details.</p>
+            </div>
+          </template>
+          <HomeSales :period="period" :range="range" />
+        </UCard>
+      </div>
     </template>
   </UDashboardPanel>
 </template>
