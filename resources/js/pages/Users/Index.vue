@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import Layout from '@/layouts/Default.vue'
   import type { TableColumn } from '@nuxt/ui'
-  import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+  import type { Row } from '@tanstack/table-core'
   import { upperFirst } from 'scule'
-  import { h, ref, resolveComponent, useTemplateRef, watch } from 'vue'
+  import { h, ref, resolveComponent, useTemplateRef, computed, watch } from 'vue'
   import { router } from '@inertiajs/vue3'
 
   defineOptions({ layout: Layout })
@@ -17,9 +17,47 @@
     created_at: string
   }
 
+  type UsersPayload = {
+    data: AppUser[]
+    meta?: {
+      current_page: number
+      last_page: number
+      per_page: number
+      total: number
+    }
+    current_page?: number
+    last_page?: number
+    per_page?: number
+    total?: number
+  }
+
   const props = defineProps<{
-    users: AppUser[]
+    users?: UsersPayload
   }>()
+
+  const usersData = computed(() => props.users?.data ?? [])
+  const usersMeta = computed(() => {
+    const meta = props.users?.meta
+    if (meta) {
+      return meta
+    }
+
+    return {
+      current_page: props.users?.current_page ?? 1,
+      last_page: props.users?.last_page ?? 1,
+      per_page: props.users?.per_page ?? 5,
+      total: props.users?.total ?? 0,
+    }
+  })
+
+  const currentPage = ref(usersMeta.value.current_page)
+
+  watch(
+    () => usersMeta.value.current_page,
+    (value) => {
+      currentPage.value = value
+    },
+  )
 
   const UAvatar = resolveComponent('UAvatar')
   const UButton = resolveComponent('UButton')
@@ -27,7 +65,6 @@
   const UDropdownMenu = resolveComponent('UDropdownMenu')
   const UCheckbox = resolveComponent('UCheckbox')
 
-  const toast = useToast()
   const table = useTemplateRef('table')
 
   const columnFilters = ref([
@@ -68,6 +105,8 @@
 
   const editingUser = ref<AppUser | null>(null)
   const isAddModalOpen = ref(false)
+  const deletingUser = ref<AppUser | null>(null)
+  const isDeleteModalOpen = ref(false)
 
   function editUser(user: AppUser) {
     editingUser.value = user
@@ -75,25 +114,8 @@
   }
 
   function deleteUser(user: AppUser) {
-    if (confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
-      router.delete(`/users/${user.uuid}`, {
-        preserveScroll: true,
-        onSuccess: () => {
-          toast.add({
-            title: 'User deleted',
-            description: `${user.name} has been deleted successfully.`,
-            color: 'success',
-          })
-        },
-        onError: () => {
-          toast.add({
-            title: 'Error',
-            description: 'Failed to delete user.',
-            color: 'error',
-          })
-        },
-      })
-    }
+    deletingUser.value = user
+    isDeleteModalOpen.value = true
   }
 
   const columns: TableColumn<AppUser>[] = [
@@ -201,19 +223,31 @@
     },
   ]
 
-  const pagination = ref({
-    pageIndex: 0,
-    pageSize: 10,
-  })
-
   function handleUserSaved() {
     isAddModalOpen.value = false
     editingUser.value = null
     router.reload({ only: ['users'] })
   }
+
+  function handlePageChange(page: number) {
+    if (page === usersMeta.value.current_page) {
+      return
+    }
+
+    router.get('/users', { page }, {
+      preserveScroll: true,
+      preserveState: true,
+      only: ['users'],
+    })
+  }
 </script>
 
 <template>
+  <UserDeleteModal
+    v-model:open="isDeleteModalOpen"
+    :user="deletingUser"
+    @deleted="handleUserSaved"
+  />
   <UDashboardPanel id="users">
     <template #header>
       <UDashboardNavbar title="Users">
@@ -291,12 +325,8 @@
         v-model:column-filters="columnFilters"
         v-model:column-visibility="columnVisibility"
         v-model:row-selection="rowSelection"
-        v-model:pagination="pagination"
-        :pagination-options="{
-          getPaginationRowModel: getPaginationRowModel(),
-        }"
         class="shrink-0"
-        :data="users ?? []"
+        :data="usersData"
         :columns="columns"
         :ui="{
           base: 'table-fixed border-separate border-spacing-0',
@@ -310,15 +340,15 @@
       <div class="mt-auto flex items-center justify-between gap-3 border-t border-default pt-4">
         <div class="text-sm text-muted">
           {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-          {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+          {{ usersMeta.total }} row(s) selected.
         </div>
 
         <div class="flex items-center gap-1.5">
           <UPagination
-            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-            :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+            v-model:page="currentPage"
+            :items-per-page="usersMeta.per_page"
+            :total="usersMeta.total"
+            @update:page="handlePageChange"
           />
         </div>
       </div>

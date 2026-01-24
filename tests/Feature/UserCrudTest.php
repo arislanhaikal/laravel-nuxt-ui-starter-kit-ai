@@ -18,7 +18,8 @@ it('can list users', function () {
         ->assertSuccessful()
         ->assertInertia(fn ($page) => $page
             ->component('Users/Index')
-            ->has('users'));
+            ->has('users.data')
+            ->has('users.total'));
 });
 
 it('can create a user', function () {

@@ -22,8 +22,8 @@ class UserController extends Controller
     {
         $users = User::query()
             ->latest()
-            ->get()
-            ->map(fn (User $user) => [
+            ->paginate(10)
+            ->through(fn (User $user) => [
                 'id' => $user->id,
                 'uuid' => $user->uuid,
                 'name' => $user->name,

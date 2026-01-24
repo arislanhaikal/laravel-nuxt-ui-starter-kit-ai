@@ -32,8 +32,8 @@ export default defineConfig({
       },
       ui: {
         colors: {
-          primary: 'green',
-          neutral: 'zinc'
+          primary: 'indigo',
+          neutral: 'gray'
         }
       },
       autoImport: {
