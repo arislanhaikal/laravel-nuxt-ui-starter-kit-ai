@@ -2,26 +2,6 @@
 
 **For Laravel Boost Projects**
 
-## Context: Laravel Boost
-
-Laravel Boost biasanya menyediakan:
-
-- Opinionated backend structure
-- Authentication & user context
-- Standardized API response format
-- Clear separation between domain logic & presentation
-
-Nuxt berperan sebagai:
-
-- **Primary UI layer**
-- Consumer dari Laravel Boost APIs
-- Single source of UI/UX truth
-
-> Laravel Boost handles _logic and data_.
-> Nuxt UI handles _presentation and interaction_.
-
----
-
 ## Core Principle (Non-Negotiable)
 
 > **Always prefer Nuxt UI components over custom UI.**
@@ -77,29 +57,7 @@ Avoid:
 
 ---
 
-## Laravel Boost API Integration Pattern
-
-### Standard API Consumption
-
-Laravel Boost APIs are assumed to return:
-
-```json
-{
-  "data": {},
-  "message": "",
-  "errors": null
-}
-```
-
-Use this consistently in Nuxt.
-
-```ts
-const { data, error } = await useFetch('/api/profile')
-```
-
----
-
-## Authentication UI (Boost-Compatible)
+## Authentication UI
 
 ### Login Form Example
 
@@ -134,7 +92,7 @@ const { data, error } = await useFetch('/api/profile')
 
 ---
 
-## Forms & Validation (Boost Style)
+## Forms & Validation
 
 ### Server-Side Validation Feedback
 
@@ -174,7 +132,7 @@ Never display raw error JSON.
 
 ---
 
-## Modal & Action Confirmation (Boost-Safe)
+## Modal & Action Confirmation
 
 All destructive actions **must** require confirmation.
 
@@ -267,4 +225,8 @@ Example (Allowed):
 </UContainer>
 ```
 
-No free-form layouts per page.
+---
+
+## The Real Use Case
+
+You can check /users for real use case for create, update, delete data using Nuxt UI
