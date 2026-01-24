@@ -33,6 +33,9 @@
 
   const props = defineProps<{
     users?: UsersPayload
+    filters?: {
+      search?: string
+    }
   }>()
 
   const usersData = computed(() => props.users?.data ?? [])
@@ -67,14 +70,10 @@
 
   const table = useTemplateRef('table')
 
-  const columnFilters = ref([
-    {
-      id: 'email',
-      value: '',
-    },
-  ])
   const columnVisibility = ref()
   const rowSelection = ref({})
+  const search = ref(props.filters?.search ?? '')
+  const isLoading = ref(false)
 
   function getRowItems(row: Row<AppUser>) {
     return [
@@ -229,17 +228,38 @@
     router.reload({ only: ['users'] })
   }
 
+  function fetchUsers(page: number) {
+    isLoading.value = true
+    router.get('/users', { page, search: search.value || undefined }, {
+      preserveScroll: true,
+      preserveState: true,
+      only: ['users', 'filters'],
+      onFinish: () => {
+        isLoading.value = false
+      },
+    })
+  }
+
   function handlePageChange(page: number) {
     if (page === usersMeta.value.current_page) {
       return
     }
 
-    router.get('/users', { page }, {
-      preserveScroll: true,
-      preserveState: true,
-      only: ['users'],
-    })
+    fetchUsers(page)
   }
+
+  let searchTimeout: ReturnType<typeof setTimeout> | null = null
+  watch(search, (value) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    searchTimeout = setTimeout(() => {
+      if (value !== (props.filters?.search ?? '')) {
+        fetchUsers(1)
+      }
+    }, 300)
+  })
 </script>
 
 <template>
@@ -264,11 +284,10 @@
     <template #body>
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput
-          :model-value="table?.tableApi?.getColumn('email')?.getFilterValue() as string"
+          v-model="search"
           class="max-w-sm"
           icon="i-lucide-search"
           placeholder="Filter emails..."
-          @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)"
         />
 
         <div class="flex flex-wrap items-center gap-1.5">
@@ -322,12 +341,12 @@
 
       <UTable
         ref="table"
-        v-model:column-filters="columnFilters"
         v-model:column-visibility="columnVisibility"
         v-model:row-selection="rowSelection"
         class="shrink-0"
         :data="usersData"
         :columns="columns"
+        :loading="isLoading"
         :ui="{
           base: 'table-fixed border-separate border-spacing-0',
           thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
