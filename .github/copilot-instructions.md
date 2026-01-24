@@ -1,4 +1,318 @@
 <laravel-boost-guidelines>
+=== .ai/nuxt-ui rules ===
+
+# Nuxt UI v4 Guideline
+
+**For Laravel Boost Projects**
+
+## Context: Laravel Boost
+
+Laravel Boost biasanya menyediakan:
+
+- Opinionated backend structure
+- Authentication & user context
+- Standardized API response format
+- Clear separation between domain logic & presentation
+
+Nuxt berperan sebagai:
+
+- **Primary UI layer**
+- Consumer dari Laravel Boost APIs
+- Single source of UI/UX truth
+
+> Laravel Boost handles _logic and data_.
+> Nuxt UI handles _presentation and interaction_.
+
+---
+
+## Core Principle (Non-Negotiable)
+
+> **Always prefer Nuxt UI components over custom UI.**
+
+If a component exists in Nuxt UI:
+
+- It **must** be used
+- Re-implementation is **not allowed**
+- Styling duplication is **not acceptable**
+
+This ensures:
+
+- Consistent UX across all Boost modules
+- Predictable behavior for auth, forms, and feedback
+- Faster onboarding for new developers
+
+## UI/UX Design Rules
+
+### Visual Direction
+
+- Minimal
+- Neutral
+- Functional
+- Product-first (not marketing-heavy)
+
+Avoid:
+
+- Decorative UI
+- Over-animated components
+- Custom gradients or shadows
+
+---
+
+### Spacing & Layout
+
+- Use Nuxt UI spacing defaults
+- Use `UContainer`, `UCard`, `UDivider`
+- Avoid manual padding unless necessary
+
+Correct:
+
+```vue
+<UCard>
+  Content
+</UCard>
+```
+
+Avoid:
+
+```html
+<div class="rounded-xl p-6 shadow"></div>
+```
+
+---
+
+## Laravel Boost API Integration Pattern
+
+### Standard API Consumption
+
+Laravel Boost APIs are assumed to return:
+
+```json
+{
+  "data": {},
+  "message": "",
+  "errors": null
+}
+```
+
+Use this consistently in Nuxt.
+
+```ts
+const { data, error } = await useFetch('/api/profile')
+```
+
+---
+
+## Authentication UI (Boost-Compatible)
+
+### Login Form Example
+
+```vue
+<template>
+    <Form
+      v-bind="AuthenticatedSessionController.store.form()"
+      :reset-on-success="['password']"
+      v-slot="{ errors, processing }"
+      class="flex flex-col gap-6"
+    >
+      <div class="grid gap-6">
+        <UFormField name="email" :error="errors.email" label="Email address">
+          <UInput type="email" class="w-full" autocomplete="email" placeholder="email@example.com" autofocus required />
+        </UFormField>
+
+        <UFormField name="password" :error="errors.password" label="Password">
+          <UInput type="password" class="w-full" autocomplete="current-password" placeholder="Password" required />
+          <template #hint>
+            <TextLink v-if="canResetPassword" :href="request()" class="text-sm text-primary" :tabindex="5"> Forgot password? </TextLink>
+          </template>
+        </UFormField>
+
+        <UFormField name="remember" :error="errors.password">
+          <UCheckbox label="Remember me" />
+        </UFormField>
+
+        <UButton :loading="processing" type="submit" block class="mt-4">Log in</UButton>
+      </div>
+</template>
+```
+
+---
+
+## Forms & Validation (Boost Style)
+
+### Server-Side Validation Feedback
+
+Laravel Boost validation errors must be mapped to Nuxt UI:
+
+```vue
+<UFormGroup label="Email" :error="errors?.email?.[0]">
+  <UInput v-model="form.email" />
+</UFormGroup>
+```
+
+Never display raw error JSON.
+
+---
+
+## Data Presentation
+
+### Table from Boost Resource
+
+```vue
+<script setup>
+  const { data } = await useFetch('/api/users')
+</script>
+
+<template>
+  <UCard>
+    <UTable
+      :rows="data.data"
+      :columns="[
+        { key: 'name', label: 'Name' },
+        { key: 'email', label: 'Email' },
+      ]"
+    />
+  </UCard>
+</template>
+```
+
+---
+
+## Modal & Action Confirmation (Boost-Safe)
+
+All destructive actions **must** require confirmation.
+
+```vue
+<UModal v-model="open">
+  <UCard>
+    <template #header>
+      Confirm Deletion
+    </template>
+
+    This action cannot be undone.
+
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton variant="ghost" @click="open = false">
+          Cancel
+        </UButton>
+        <UButton color="red">
+          Delete
+        </UButton>
+      </div>
+    </template>
+  </UCard>
+</UModal>
+```
+
+---
+
+## Notification & Feedback
+
+### API Success
+
+```vue
+<UAlert color="green" variant="soft" title="Success" description="Data saved successfully." />
+```
+
+### API Error
+
+```vue
+<UAlert color="red" variant="soft" title="Error" description="Something went wrong." />
+```
+
+---
+
+## Tailwind Usage Policy
+
+Allowed:
+
+- Layout (`flex`, `grid`, `gap`)
+- Positioning (`max-w`, `mx-auto`)
+
+Disallowed:
+
+- Custom button styles
+- Custom inputs
+- Visual duplication of Nuxt UI components
+
+---
+
+## Custom Components Rule (Strict)
+
+Custom components are allowed **only if**:
+
+1. Nuxt UI has no equivalent
+2. Component wraps Nuxt UI internally
+3. Approved by technical lead
+
+Example (Allowed):
+
+```vue
+<!-- StatusBadge.vue -->
+<UBadge :color="status === 'active' ? 'green' : 'gray'">
+  {{ status }}
+</UBadge>
+```
+
+---
+
+## Page Structure Convention
+
+```vue
+<UContainer>
+  <UCard>
+    <template #header>
+      Page Title
+    </template>
+
+    Page Content
+  </UCard>
+</UContainer>
+```
+
+No free-form layouts per page.
+
+=== .ai/core rules ===
+
+# Core Guidelines
+
+**This is the core guidelines. These are very important and high prio and have precedence over other guidelines in this file.**
+
+## General Rules
+
+- If you find yourself in a loop of failing, ask the user before continuing.
+- Don't generate redundant code. If the code is already there, use it.
+- Write LESS code! This is very important.
+
+## Coding
+
+- Always follow the same coding style that the project uses and other parts are built with
+- Use simplified solutions rather than complex ones
+- Always analyse the current codebase before adding new code
+- This codebase is written by human. Always check with the user if something is not clear or doesn't make sense.
+- Write code with less dependencies on third-party packages
+- Write reusable code all the time.
+- Always check UI component before you make new component, please use shadcn-vue component for better UI/UX consistency
+- Never run npm build or dev or artisan serve commands because user is already running them in the background.
+- Avoid unnecessary code comments.
+
+## Testing
+
+- Don't write too many tests.
+- Don't test the framework or third-party packages. Only test the logic.
+- Always use refresh database in the tests.
+- Never test obvious things like command signature or transactions or etc.
+- Use existing tests to add more tests rather than creating focused test files. If doesn't exist, ask the user's confirmation when creating.
+
+## Working with Git and Issues and PRs
+
+- The system has `gh` installed. use it to view the issues and PRs.
+
+## Code Formatting and Style and Linting
+
+- Don't run formatters like pint or prettier. User will run them later.
+- When writing code, keep an eye on the PHPStan level and don't make mistakes.
+
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -24,13 +338,12 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - rector/rector (RECTOR) - v2
 - @inertiajs/vue3 (INERTIA) - v2
 - vue (VUE) - v3
-- @nuxt/ui (NUXT-UI) - v4
 - @laravel/vite-plugin-wayfinder (WAYFINDER) - v0
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
 
 ## Conventions
-- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, naming.
+- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
 
@@ -38,7 +351,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
 
 ## Application Structure & Architecture
-- Stick to existing directory structure - don't create new base folders without approval.
+- Stick to existing directory structure; don't create new base folders without approval.
 - Do not change the application's dependencies without approval.
 
 ## Frontend Bundling
@@ -50,17 +363,16 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ## Documentation Files
 - You must only create documentation files if explicitly requested by the user.
 
-
 === boost rules ===
 
 ## Laravel Boost
 - Laravel Boost is an MCP server that comes with powerful tools designed specifically for this application. Use them.
 
 ## Artisan
-- Use the `list-artisan-commands` tool when you need to call an Artisan command to double check the available parameters.
+- Use the `list-artisan-commands` tool when you need to call an Artisan command to double-check the available parameters.
 
 ## URLs
-- Whenever you share a project URL with the user you should use the `get-absolute-url` tool to ensure you're using the correct scheme, domain / IP, and port.
+- Whenever you share a project URL with the user, you should use the `get-absolute-url` tool to ensure you're using the correct scheme, domain/IP, and port.
 
 ## Tinker / Debugging
 - You should use the `tinker` tool when you need to execute PHP to debug code or query Eloquent models directly.
@@ -71,22 +383,21 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Only recent browser logs will be useful - ignore old logs.
 
 ## Searching Documentation (Critically Important)
-- Boost comes with a powerful `search-docs` tool you should use before any other approaches. This tool automatically passes a list of installed packages and their versions to the remote Boost API, so it returns only version-specific documentation specific for the user's circumstance. You should pass an array of packages to filter on if you know you need docs for particular packages.
-- The 'search-docs' tool is perfect for all Laravel related packages, including Laravel, Inertia, Livewire, Filament, Tailwind, Pest, Nova, Nightwatch, etc.
-- You must use this tool to search for Laravel-ecosystem documentation before falling back to other approaches.
+- Boost comes with a powerful `search-docs` tool you should use before any other approaches when dealing with Laravel or Laravel ecosystem packages. This tool automatically passes a list of installed packages and their versions to the remote Boost API, so it returns only version-specific documentation for the user's circumstance. You should pass an array of packages to filter on if you know you need docs for particular packages.
+- The `search-docs` tool is perfect for all Laravel-related packages, including Laravel, Inertia, Livewire, Filament, Tailwind, Pest, Nova, Nightwatch, etc.
+- You must use this tool to search for Laravel ecosystem documentation before falling back to other approaches.
 - Search the documentation before making code changes to ensure we are taking the correct approach.
-- Use multiple, broad, simple, topic based queries to start. For example: `['rate limiting', 'routing rate limiting', 'routing']`.
-- Do not add package names to queries - package information is already shared. For example, use `test resource table`, not `filament 4 test resource table`.
+- Use multiple, broad, simple, topic-based queries to start. For example: `['rate limiting', 'routing rate limiting', 'routing']`.
+- Do not add package names to queries; package information is already shared. For example, use `test resource table`, not `filament 4 test resource table`.
 
 ### Available Search Syntax
 - You can and should pass multiple queries at once. The most relevant results will be returned first.
 
-1. Simple Word Searches with auto-stemming - query=authentication - finds 'authenticate' and 'auth'
-2. Multiple Words (AND Logic) - query=rate limit - finds knowledge containing both "rate" AND "limit"
-3. Quoted Phrases (Exact Position) - query="infinite scroll" - Words must be adjacent and in that order
-4. Mixed Queries - query=middleware "rate limit" - "middleware" AND exact phrase "rate limit"
-5. Multiple Queries - queries=["authentication", "middleware"] - ANY of these terms
-
+1. Simple Word Searches with auto-stemming - query=authentication - finds 'authenticate' and 'auth'.
+2. Multiple Words (AND Logic) - query=rate limit - finds knowledge containing both "rate" AND "limit".
+3. Quoted Phrases (Exact Position) - query="infinite scroll" - words must be adjacent and in that order.
+4. Mixed Queries - query=middleware "rate limit" - "middleware" AND exact phrase "rate limit".
+5. Multiple Queries - queries=["authentication", "middleware"] - ANY of these terms.
 
 === php rules ===
 
@@ -97,7 +408,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ### Constructors
 - Use PHP 8 constructor property promotion in `__construct()`.
     - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
-- Do not allow empty `__construct()` methods with zero parameters.
+- Do not allow empty `__construct()` methods with zero parameters unless the constructor is private.
 
 ### Type Declarations
 - Always use explicit return type declarations for methods and functions.
@@ -111,7 +422,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 </code-snippet>
 
 ## Comments
-- Prefer PHPDoc blocks over comments. Never use comments within the code itself unless there is something _very_ complex going on.
+- Prefer PHPDoc blocks over inline comments. Never use comments within the code itself unless there is something very complex going on.
 
 ## PHPDoc Blocks
 - Add useful array shape type definitions for arrays when appropriate.
@@ -119,24 +430,29 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## Enums
 - Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
 
+=== herd rules ===
+
+## Laravel Herd
+
+- The application is served by Laravel Herd and will be available at: `https?://[kebab-case-project-dir].test`. Use the `get-absolute-url` tool to generate URLs for the user to ensure valid URLs.
+- You must not run any commands to make the site available via HTTP(S). It is always available through Laravel Herd.
 
 === tests rules ===
 
 ## Test Enforcement
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific filename or filter.
-
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
 
 === inertia-laravel/core rules ===
 
-## Inertia Core
+## Inertia
 
-- Inertia.js components should be placed in the `resources/js/Pages` directory unless specified differently in the JS bundler (vite.config.js).
+- Inertia.js components should be placed in the `resources/js/Pages` directory unless specified differently in the JS bundler (`vite.config.js`).
 - Use `Inertia::render()` for server-side routing instead of traditional Blade views.
-- Use `search-docs` for accurate guidance on all things Inertia.
+- Use the `search-docs` tool for accurate guidance on all things Inertia.
 
-<code-snippet lang="php" name="Inertia::render Example">
+<code-snippet name="Inertia Render Example" lang="php">
 // routes/web.php example
 Route::get('/users', function () {
     return Inertia::render('Users/Index', [
@@ -145,28 +461,26 @@ Route::get('/users', function () {
 });
 </code-snippet>
 
-
 === inertia-laravel/v2 rules ===
 
 ## Inertia v2
 
-- Make use of all Inertia features from v1 & v2. Check the documentation before making any changes to ensure we are taking the correct approach.
+- Make use of all Inertia features from v1 and v2. Check the documentation before making any changes to ensure we are taking the correct approach.
 
 ### Inertia v2 New Features
-- Polling
-- Prefetching
-- Deferred props
-- Infinite scrolling using merging props and `WhenVisible`
-- Lazy loading data on scroll
+- Deferred props.
+- Infinite scrolling using merging props and `WhenVisible`.
+- Lazy loading data on scroll.
+- Polling.
+- Prefetching.
 
 ### Deferred Props & Empty States
-- When using deferred props on the frontend, you should add a nice empty state with pulsing / animated skeleton.
+- When using deferred props on the frontend, you should add a nice empty state with pulsing/animated skeleton.
 
 ### Inertia Form General Guidance
-- The recommended way to build forms when using Inertia is with the `<Form>` component - a useful example is below. Use `search-docs` with a query of `form component` for guidance.
-- Forms can also be built using the `useForm` helper for more programmatic control, or to follow existing conventions. Use `search-docs` with a query of `useForm helper` for guidance.
-- `resetOnError`, `resetOnSuccess`, and `setDefaultsOnSuccess` are available on the `<Form>` component. Use `search-docs` with a query of 'form component resetting' for guidance.
-
+- The recommended way to build forms when using Inertia is with the `<Form>` component - a useful example is below. Use the `search-docs` tool with a query of `form component` for guidance.
+- Forms can also be built using the `useForm` helper for more programmatic control, or to follow existing conventions. Use the `search-docs` tool with a query of `useForm helper` for guidance.
+- `resetOnError`, `resetOnSuccess`, and `setDefaultsOnSuccess` are available on the `<Form>` component. Use the `search-docs` tool with a query of `form component resetting` for guidance.
 
 === laravel/core rules ===
 
@@ -178,7 +492,7 @@ Route::get('/users', function () {
 
 ### Database
 - Always use proper Eloquent relationship methods with return type hints. Prefer relationship methods over raw queries or manual joins.
-- Use Eloquent models and relationships before suggesting raw database queries
+- Use Eloquent models and relationships before suggesting raw database queries.
 - Avoid `DB::`; prefer `Model::query()`. Generate code that leverages Laravel's ORM capabilities rather than bypassing them.
 - Generate code that prevents N+1 query problems by using eager loading.
 - Use Laravel's query builder for very complex database operations.
@@ -213,56 +527,55 @@ Route::get('/users', function () {
 ### Vite Error
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
 
-
 === laravel/v12 rules ===
 
 ## Laravel 12
 
-- Use the `search-docs` tool to get version specific documentation.
+- Use the `search-docs` tool to get version-specific documentation.
 - Since Laravel 11, Laravel has a new streamlined file structure which this project uses.
 
 ### Laravel 12 Structure
-- No middleware files in `app/Http/Middleware/`.
+- In Laravel 12, middleware are no longer registered in `app/Http/Kernel.php`.
+- Middleware are configured declaratively in `bootstrap/app.php` using `Application::configure()->withMiddleware()`.
 - `bootstrap/app.php` is the file to register middleware, exceptions, and routing files.
 - `bootstrap/providers.php` contains application specific service providers.
-- **No app\Console\Kernel.php** - use `bootstrap/app.php` or `routes/console.php` for console configuration.
-- **Commands auto-register** - files in `app/Console/Commands/` are automatically available and do not require manual registration.
+- The `app\Console\Kernel.php` file no longer exists; use `bootstrap/app.php` or `routes/console.php` for console configuration.
+- Console commands in `app/Console/Commands/` are automatically available and do not require manual registration.
 
 ### Database
 - When modifying a column, the migration must include all of the attributes that were previously defined on the column. Otherwise, they will be dropped and lost.
-- Laravel 11 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.
+- Laravel 12 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.
 
 ### Models
 - Casts can and likely should be set in a `casts()` method on a model rather than the `$casts` property. Follow existing conventions from other models.
-
 
 === wayfinder/core rules ===
 
 ## Laravel Wayfinder
 
-Wayfinder generates TypeScript functions and types for Laravel controllers and routes which you can import into your client side code. It provides type safety and automatic synchronization between backend routes and frontend code.
+Wayfinder generates TypeScript functions and types for Laravel controllers and routes which you can import into your client-side code. It provides type safety and automatic synchronization between backend routes and frontend code.
 
 ### Development Guidelines
-- Always use `search-docs` to check wayfinder correct usage before implementing any features.
-- Always Prefer named imports for tree-shaking (e.g., `import { show } from '@/actions/...'`)
-- Avoid default controller imports (prevents tree-shaking)
-- Run `php artisan wayfinder:generate` after route changes if Vite plugin isn't installed
+- Always use the `search-docs` tool to check Wayfinder correct usage before implementing any features.
+- Always prefer named imports for tree-shaking (e.g., `import { show } from '@/actions/...'`).
+- Avoid default controller imports (prevents tree-shaking).
+- Run `php artisan wayfinder:generate` after route changes if Vite plugin isn't installed.
 
 ### Feature Overview
-- Form Support: Use `.form()` with `--with-form` flag for HTML form attributes — `<form {...store.form()}>` → `action="/posts" method="post"`
-- HTTP Methods: Call `.get()`, `.post()`, `.patch()`, `.put()`, `.delete()` for specific methods — `show.head(1)` → `{ url: "/posts/1", method: "head" }`
-- Invokable Controllers: Import and invoke directly as functions. For example, `import StorePost from '@/actions/.../StorePostController'; StorePost()`
-- Named Routes: Import from `@/routes/` for non-controller routes. For example, `import { show } from '@/routes/post'; show(1)` for route name `post.show`
-- Parameter Binding: Detects route keys (e.g., `{post:slug}`) and accepts matching object properties — `show("my-post")` or `show({ slug: "my-post" })`
-- Query Merging: Use `mergeQuery` to merge with `window.location.search`, set values to `null` to remove — `show(1, { mergeQuery: { page: 2, sort: null } })`
-- Query Parameters: Pass `{ query: {...} }` in options to append params — `show(1, { query: { page: 1 } })` → `"/posts/1?page=1"`
-- Route Objects: Functions return `{ url, method }` shaped objects — `show(1)` → `{ url: "/posts/1", method: "get" }`
-- URL Extraction: Use `.url()` to get URL string — `show.url(1)` → `"/posts/1"`
+- Form Support: Use `.form()` with `--with-form` flag for HTML form attributes — `<form {...store.form()}>` → `action="/posts" method="post"`.
+- HTTP Methods: Call `.get()`, `.post()`, `.patch()`, `.put()`, `.delete()` for specific methods — `show.head(1)` → `{ url: "/posts/1", method: "head" }`.
+- Invokable Controllers: Import and invoke directly as functions. For example, `import StorePost from '@/actions/.../StorePostController'; StorePost()`.
+- Named Routes: Import from `@/routes/` for non-controller routes. For example, `import { show } from '@/routes/post'; show(1)` for route name `post.show`.
+- Parameter Binding: Detects route keys (e.g., `{post:slug}`) and accepts matching object properties — `show("my-post")` or `show({ slug: "my-post" })`.
+- Query Merging: Use `mergeQuery` to merge with `window.location.search`, set values to `null` to remove — `show(1, { mergeQuery: { page: 2, sort: null } })`.
+- Query Parameters: Pass `{ query: {...} }` in options to append params — `show(1, { query: { page: 1 } })` → `"/posts/1?page=1"`.
+- Route Objects: Functions return `{ url, method }` shaped objects — `show(1)` → `{ url: "/posts/1", method: "get" }`.
+- URL Extraction: Use `.url()` to get URL string — `show.url(1)` → `"/posts/1"`.
 
 ### Example Usage
 
 <code-snippet name="Wayfinder Basic Usage" lang="typescript">
-    // Import controller methods (tree-shakable)
+    // Import controller methods (tree-shakable)...
     import { show, store, update } from '@/actions/App/Http/Controllers/PostController'
 
     // Get route object with URL and method...
@@ -280,7 +593,6 @@ Wayfinder generates TypeScript functions and types for Laravel controllers and r
     postShow(1) // { url: "/posts/1", method: "get" }
 </code-snippet>
 
-
 ### Wayfinder + Inertia
 If your application uses the `<Form>` component from Inertia, you can use Wayfinder to generate form action and method automatically.
 <code-snippet name="Wayfinder Form Component (Vue)" lang="vue">
@@ -289,14 +601,12 @@ If your application uses the `<Form>` component from Inertia, you can use Wayfin
 
 </code-snippet>
 
-
 === pint/core rules ===
 
 ## Laravel Pint Code Formatter
 
 - You must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style.
 - Do not run `vendor/bin/pint --test`, simply run `vendor/bin/pint` to fix any formatting issues.
-
 
 === pest/core rules ===
 
@@ -318,9 +628,9 @@ it('is true', function () {
 
 ### Running Tests
 - Run the minimal number of tests using an appropriate filter before finalizing code edits.
-- To run all tests: `php artisan test`.
-- To run all tests in a file: `php artisan test tests/Feature/ExampleTest.php`.
-- To filter on a particular test name: `php artisan test --filter=testName` (recommended after making a change to a related file).
+- To run all tests: `php artisan test --compact`.
+- To run all tests in a file: `php artisan test --compact tests/Feature/ExampleTest.php`.
+- To filter on a particular test name: `php artisan test --compact --filter=testName` (recommended after making a change to a related file).
 - When the tests relating to your changes are passing, ask the user if they would like to run the entire test suite to ensure everything is still passing.
 
 ### Pest Assertions
@@ -339,7 +649,7 @@ it('returns all', function () {
 - You can also create partial mocks using the same import or self method.
 
 ### Datasets
-- Use datasets in Pest to simplify tests which have a lot of duplicated data. This is often the case when testing validation rules, so consider going with this solution when writing tests for validation rules.
+- Use datasets in Pest to simplify tests that have a lot of duplicated data. This is often the case when testing validation rules, so consider this solution when writing tests for validation rules.
 
 <code-snippet name="Pest Dataset Example" lang="php">
 it('has emails', function (string $email) {
@@ -350,18 +660,17 @@ it('has emails', function (string $email) {
 ]);
 </code-snippet>
 
-
 === pest/v4 rules ===
 
 ## Pest 4
 
-- Pest v4 is a huge upgrade to Pest and offers: browser testing, smoke testing, visual regression testing, test sharding, and faster type coverage.
+- Pest 4 is a huge upgrade to Pest and offers: browser testing, smoke testing, visual regression testing, test sharding, and faster type coverage.
 - Browser testing is incredibly powerful and useful for this project.
 - Browser tests should live in `tests/Browser/`.
 - Use the `search-docs` tool for detailed guidance on utilizing these features.
 
 ### Browser Testing
-- You can use Laravel features like `Event::fake()`, `assertAuthenticated()`, and model factories within Pest v4 browser tests, as well as `RefreshDatabase` (when needed) to ensure a clean state for each test.
+- You can use Laravel features like `Event::fake()`, `assertAuthenticated()`, and model factories within Pest 4 browser tests, as well as `RefreshDatabase` (when needed) to ensure a clean state for each test.
 - Interact with the page (click, type, scroll, select, submit, drag-and-drop, touch gestures, etc.) when appropriate to complete the test.
 - If requested, test on multiple browsers (Chrome, Firefox, Safari).
 - If requested, test on different devices and viewports (like iPhone 14 Pro, tablets, or custom breakpoints).
@@ -395,7 +704,6 @@ $pages = visit(['/', '/about', '/contact']);
 $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 </code-snippet>
 
-
 === inertia-vue/core rules ===
 
 ## Inertia + Vue
@@ -410,10 +718,9 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 
 </code-snippet>
 
-
 === inertia-vue/v2/forms rules ===
 
-## Inertia + Vue Forms
+## Inertia v2 + Vue Forms
 
 <code-snippet name="`<Form>` Component Example" lang="vue">
 
@@ -450,89 +757,4 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 </Form>
 
 </code-snippet>
-
-
-=== nuxt-ui/core rules ===
-
-## Nuxt UI Components
-
-- This application uses **Nuxt UI v4** for all UI components. Always use Nuxt UI components, not shadcn-vue or custom component replacements.
-- Nuxt UI components are auto-imported and available globally. No explicit imports needed for most components.
-- Use the Nuxt UI MCP tools (`mcp_nuxt-ui_*`) to discover available components, view documentation, and get examples.
-
-### Component Usage Guidelines
-
-- **Always use Nuxt UI components** - Import and use components from `@nuxt/ui` package (auto-imported).
-- **Component Naming**: Nuxt UI components use PascalCase with `U` prefix (e.g., `UButton`, `UModal`, `UCard`, `UInput`, `UForm`, `UTable`, `UBadge`, `UDropdownMenu`, etc.).
-- **No Custom UI Components**: Do NOT create custom component replacements or wrappers unless explicitly requested. Use the provided Nuxt UI components.
-- **Check Existing Components**: Before creating new components, check existing components in `resources/js/components/` to see if similar functionality exists.
-- **Documentation**: Use the `mcp_nuxt-ui_get-component` tool to get component documentation and `mcp_nuxt-ui_get-example` for usage examples.
-
-### Dashboard Design Principles
-
-- **Minimalist Design**: Emphasize clean typography, ample white space, and a restrained color palette. Avoid visual clutter or excessive ornamentation.
-- **Responsive Layout**: Implement responsive layouts that work seamlessly across all device sizes (mobile, tablet, desktop).
-- **Clean Aesthetics**: Use Nuxt UI's built-in design system for consistent spacing, colors, and typography.
-- **Component Composition**: Leverage Nuxt UI's component composition patterns (e.g., `UDashboardPanel`, `UDashboardNavbar`, `UDashboardSidebar`, `UDashboardToolbar`).
-
-### Common Nuxt UI Components
-
-- **Layout Components**: `UDashboardPanel`, `UDashboardNavbar`, `UDashboardSidebar`, `UDashboardToolbar`, `UPageCard`
-- **Form Components**: `UForm`, `UFormField`, `UInput`, `UTextarea`, `USelect`, `UCheckbox`, `URadio`, `UButton`
-- **Data Display**: `UTable`, `UCard`, `UBadge`, `UAvatar`, `UProgress`, `USkeleton`
-- **Overlays**: `UModal`, `UDropdownMenu`, `UTooltip`, `UPopover`, `UAlert`
-- **Navigation**: `UTabs`, `UPagination`, `UBreadcrumb`
-- **Feedback**: `UToast` (via `useToast()` composable), `UAlert`, `UNotification`
-
-### Example Usage
-
-<code-snippet name="Nuxt UI Button Example" lang="vue">
-<UButton color="primary" variant="solid" icon="i-lucide-plus">
-  Create New
-</UButton>
-</code-snippet>
-
-<code-snippet name="Nuxt UI Form Example" lang="vue">
-<UForm :schema="schema" :state="state" @submit="onSubmit">
-  <UFormField label="Name" name="name">
-    <UInput v-model="state.name" />
-  </UFormField>
-  <UFormField label="Email" name="email">
-    <UInput v-model="state.email" type="email" />
-  </UFormField>
-  <UButton type="submit">Submit</UButton>
-</UForm>
-</code-snippet>
-
-<code-snippet name="Nuxt UI Dashboard Layout Example" lang="vue">
-<UDashboardPanel id="dashboard">
-  <template #header>
-    <UDashboardNavbar title="Dashboard">
-      <template #right>
-        <UButton icon="i-lucide-plus" />
-      </template>
-    </UDashboardNavbar>
-  </template>
-  
-  <template #body>
-    <UCard>
-      <template #header>
-        <h3>Statistics</h3>
-      </template>
-      <!-- Content -->
-    </UCard>
-  </template>
-</UDashboardPanel>
-</code-snippet>
-
-### Responsive Design
-
-- Use Tailwind CSS responsive utilities (`sm:`, `md:`, `lg:`, `xl:`) for responsive layouts.
-- Nuxt UI components are responsive by default, but use Tailwind utilities for custom responsive behavior.
-- Test layouts on multiple viewport sizes to ensure proper responsiveness.
-
-### Dark Mode
-
-- Nuxt UI supports dark mode out of the box. Use the `colorMode` composable or `UColorModeButton` component.
-- Ensure all new components and pages support dark mode properly.
 </laravel-boost-guidelines>
